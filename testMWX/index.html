@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image" href="https://www.f6s.com/content-resource/profiles/3506956_th1.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
+        rel="stylesheet" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MetaworldX</title>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.120/Build/Cesium/Widgets/widgets.css"
+        rel="stylesheet" />
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.120/Build/Cesium/Cesium.js"></script>
+    <script src="/CesiumHeatmap.js"></script>
+    <link rel="stylesheet" href="./src/style.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app">
+        <div class="viewer-wrapper">
+            <div id="cesiumContainer"></div>
+        </div>
+
+        <nav class="topnav">
+            <div class="logo">
+                <h2>
+                    <span class="gradient">
+                        <img src="/MWX.png" height="120" width="120"/>
+                    </span>
+                </h2>
+            </div>
+        </nav>
+
+        <div class="sidebar">
+            <div class="sidebar-content">
+                <!-- Wind Speed -->
+                <div class="sidebar-section">
+                    <label for="windSlider" class="section-title">
+                        Wind Speed: <span id="windValue">20</span> km/h
+                    </label>
+                    <input type="range" id="windSlider" min="20" max="200" step="1" value="20" class="slider-input" />
+                </div>
+
+                <!-- Wind Direction -->
+                <div class="sidebar-section no-border">
+                    <label for="windDirection" class="section-title">Wind Direction:</label>
+                    <select id="windDirection" class="dropdown-select">
+                        <option value="east">East</option>
+                        <option value="north">North</option>
+                        <option value="south">South</option>
+                        <option value="west">West</option>
+                    </select>
+                </div>
+
+                <div class="sidebar-section no-border">
+                    <label for="" class="section-title">Telecom Towers:</label>
+                    <select id="modelDropdown" class="dropdown-select">
+
+                    </select>
+                </div>
+
+                <div class="sidebar-section no-border">
+                    <label for="" class="section-title">Typhoon ForeCast:</label>
+                    <select id="typhoonForeCastDropdown" class="dropdown-select">
+
+                    </select>
+                </div>
+
+                <div class="sidebar-section no-border">
+                    <label for="" class="section-title">Active Typhoons:</label>
+                    <select id="activetyphoon" class="dropdown-select">
+
+                    </select>
+                </div>
+                <button id="openWeatherDetailsButton" disabled class="weatherVisualize">Weather Visualization</button>
+
+                <button id="flyToPhiphinns" class="typhoonVisualize">Zoom to Philippines</button>
+
+                <div id="heatMapLabel" style="display: none;"> <label for="heatmap" class="section-title"
+                        style="display: flex; align-items: center;">Heatmap:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleHeatmapSwitch">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <div> <label for="heatmap" class="section-title" style="display: flex; align-items: center;">3D Typhoon
+                        Visualization:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle3DTyphoonSwitch">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div id="weatherPopup" class="weather-popup">
+            <h1 style="color: white; border-bottom: 1px solid white; margin-bottom: 0.5rem;">Today's Weather</h1>
+            <div class="weather-card">
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <h2 id="location" style="font-size: 1.5rem; color: white; font-weight: bold;">--</h2>
+                        <h5 id="formattedTime" style="font-size: 0.8rem; color: white; font-weight: bold;">--</h5>
+                    </div>
+                    <div>
+                        <button id="closeWeatherBtn"><i class="material-icons"
+                                style="font-size: 0.8rem; color: #01c9d0;">close</i></button>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 1rem 0rem;">
+                    <div style="display: flex;align-items: center;">
+                        <h1 id="temperature" style="font-size: 3rem; color: white;">--°C</h1>
+                    </div>
+                    <div id="weatherImageContainer" style="width: 150px; height: 150px; overflow: hidden;">
+                        <img id="weatherImage" src="/default.png"
+                            style="width: 100%; height: 100%; object-fit: contain;" />
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <p class="weather-info-text" style="color: white;"><i class="material-icons"
+                                style="color: #01c9d0;">storm</i> <strong>Condition:</strong> <span
+                                id="condition">--</span></p>
+                    </div>
+                    <div>
+                        <p class="weather-info-text" style="color: white;"><i class="material-icons"
+                                style="color: #01c9d0;">wb_sunny</i> <strong>UV Index:</strong> <span id="uv">--</span>
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <p class="weather-info-text" style="color: white;"><i class="material-icons"
+                                style="color: #01c9d0;">air</i> <strong>Wind Speed:</strong> <span id="wind">--</span>
+                        </p>
+                    </div>
+                    <div>
+                        <p class="weather-info-text" style="color: white;"><i class="material-icons"
+                                style="color: #01c9d0;">water_drop</i> <strong>Humidity:</strong> <span
+                                id="humidity">--</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="alertsPopup" class="alert-popup">
+            <h1 style="color: white; border-bottom: 1px solid white; margin-bottom: 0.5rem;">Weather Alerts</h1>
+            <div class="alert-card">
+                <div style="display: flex; justify-content: space-between;">
+                    <h2 style="font-size: 1.2rem; color: white; font-weight: bold;" id="alertHeadline">--</h2>
+                    <button id="closeAlertsBtn"><i class="material-icons"
+                            style="font-size: 0.8rem; color: #01c9d0;">close</i></button>
+                </div>
+                <p style="color: white;"><strong>Event:</strong> <span id="alertEvent">--</span></p>
+                <p style="color: white;"><strong>Severity:</strong> <span id="alertSeverity">--</span></p>
+                <p style="color: white;"><strong>Expires:</strong> <span id="alertExpires">--</span></p>
+                <p id="alertDescription" style="color: white;">--</p>
+                <p style="color: white;"><strong>Instruction:</strong> <span id="alertInstruction">--</span></p>
+            </div>
+        </div>
+
+        <div id="aqiPopup" class="aqi-popup">
+            <h1 style="color: white; border-bottom: 1px solid white; margin-bottom: 0.5rem;">Air Quality Forecast</h1>
+            <div class="aqi-card" style="color:white;">
+                <!-- Header -->
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="font-size: 1.2rem; font-weight: bold;">Select Date & Hour</h2>
+                    <button id="closeAqiBtn"><i class="material-icons"
+                            style="font-size: 0.8rem; color: #01c9d0;">close</i></button>
+                </div>
+                <!-- Date Picker -->
+                <input type="date" id="dateSelector" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0;">
+                <!-- Hour Selector -->
+
+                <div class="sidebar-section no-border">
+                    <label for="" class="section-title">Select hours:</label>
+                    <select id="hourSelector" class="dropdown-select"></select>
+                </div>
+                <!-- AQI Info -->
+                <div id="aqiDetails">
+                    <h3 id="aqiValue" style="padding:0.5rem; border-radius:6px;">AQI: --</h3>
+                    <p style="padding: 0.5rem 0rem;"><strong>Category: <span id="aqiCategory">--</span></strong></p>
+                    <p style="padding: 0.5rem 0rem;"><strong>Dominant Pollutant:</strong> <span
+                            id="aqiDominant">--</span></p>
+                    <!-- <h4>Pollutants</h4>
+                    <ul id="pollutantList"></ul> -->
+                    <h4 style="padding: 0.5rem 0rem;"><strong>Health Recommendations</strong></h4>
+                    <ul id="healthRecs" style="height: 200px; overflow: auto;"></ul>
+                </div>
+                <!-- Chart -->
+                <h4 style="margin-top:1rem;"><strong>AQI Trend</strong></h4>
+                <canvas id="aqiChart" style="margin-top: 0.5rem; background: transparent; border-radius: 8px;"></canvas>
+                <h4 style="margin-top:1rem;"><strong>Pollutants Breakdown</strong></h4>
+                <canvas id="pollutantChart"
+                    style="margin-top: 0.5rem; background: transparent; border-radius: 8px;"></canvas>
+            </div>
+        </div>
+
+        <div id="api-message" style="
+ position: fixed;
+ display: none;
+ top: 50px;
+ left: 50%;
+ transform: translateX(-50%);
+ background: rgba(0,0,0,0.8);
+ color: #fff;
+ padding: 10px 20px;
+ border-radius: 6px;
+ font-family: sans-serif;
+ z-index: 9999;
+"></div>
+
+    </div>
+    </div>
+    <script>
+        const windSlider = document.getElementById("windSlider");
+        const windValue = document.getElementById("windValue");
+
+        const typhoonSlider = document.getElementById("typhoonSlider");
+        const typhoonValue = document.getElementById("typhoonValue");
+
+        function updateSliderBackground(sliderEl) {
+            const value =
+                ((sliderEl.value - sliderEl.min) / (sliderEl.max - sliderEl.min)) *
+                100;
+            const fillPercent = value > 0 ? value : 1; // ensure minimum visible fill
+            sliderEl.style.background = `linear-gradient(
+      to right,
+      #01c9d0 ${fillPercent}%,
+      #01c9d04d ${fillPercent}%
+    )`;
+        }
+
+        windSlider.addEventListener("input", () => {
+            windValue.textContent = windSlider.value;
+            updateSliderBackground(windSlider);
+        });
+
+        // Initialize both sliders
+        updateSliderBackground(windSlider);
+    </script>
+    <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
